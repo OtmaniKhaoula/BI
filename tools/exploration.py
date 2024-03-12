@@ -221,7 +221,7 @@ def scatter(dataList, dataNames):
                 plt.savefig(f'../graphics/{names}/scatter_{col1}-{col2}.png')
 
                 # Affichage du scatter plot
-                plt.show()
+                #plt.show()
 
 dataList = [agents, lots]
 dataNames = ['agents', 'criteria', 'lots']
@@ -263,7 +263,7 @@ def boxplots(dataList, dataNames):
                 plt.savefig(f'../graphics/{names}/boxplot_{col1}-{col2}.png')
 
                 # Afficher le boxplot
-                plt.show()
+                #plt.show()
 
 dataList = [agents, criteria, lots]
 dataNames = ["agents", "criteria", "lots"]
@@ -431,7 +431,7 @@ def outliers(dataList_float, dataNames):
             plt.title(f'Histogramme des {col}')
             plt.xlabel('Variables')
             plt.ylabel('Effectifs')
-            plt.show()
+            #plt.show()
 
     return dfx
 
