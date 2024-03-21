@@ -12,6 +12,8 @@ import seaborn as sns
 from scipy.stats import chi2_contingency
 from scipy.stats import pearsonr
 from scipy.stats import f_oneway
+import statsmodels.api as sm
+from sklearn.ensemble import IsolationForest
 
 """
 Importation des tables
@@ -81,27 +83,27 @@ def graphics_qual(dataList_object, dataNames):
                 # Créer une série contenant les 19 valeurs les plus fréquentes et la valeur "Autres"
                 top_10_series = top_10_frequences.append(pd.Series(autres_effectifs, index=['Autres']))
             """
-            print("top_10_series = ", top_10_series)
+            #print("top_10_series = ", top_10_series)
             
-            print(col)
+            #print(col)
             
             x_pos = np.arange(len(top_10_series))
             
             plt.figure(figsize=(9, 9))
             plt.bar(x_pos, top_10_series)
-            plt.title(f'Barplot des {col}')
+            plt.title(f'Barplot des {col}', fontsize=14)
             # Étiqueter les barres avec les modalités
-            plt.xticks(x_pos, top_10_series.index, rotation=45, fontsize=8)
+            plt.xticks(x_pos, top_10_series.index, rotation=90, fontsize=8)
             plt.xlabel('Variables')
             plt.ylabel('Effectifs')
             #plt.show()
             plt.savefig(f'../graphics/{name}/barplot_{col}.png')
             
-            print("cercle")
+            #print("cercle")
             #explode = (0, 0.2, 0, 0, 0) # on isole seulement la deuxième part (c.a.d 'solid')
             labels = top_10_series.index
             proportion_pattern = top_10_series
-            fig, ax = plt.subplots(figsize=(10, 10))
+            fig, ax = plt.subplots(figsize=(14, 14))
             ax.pie(proportion_pattern, labels=labels, #explode=explode, 
                    autopct='%1.1f%%', shadow=True, startangle=90)
             ax.axis('equal')
@@ -110,25 +112,47 @@ def graphics_qual(dataList_object, dataNames):
             plt.savefig(f'../graphics/{name}/cercle_{col}.png')
             print("terminé")
 
+"""
 columns_object = ['agents', "criteria", 'lots', 'name']
-#graphics_qual(dataList_object, columns_object)
+graphics_qual(dataList_object, columns_object)
+"""
 
 # Graphiques pour les variables quanti (de type float64)
 def graphics_quan(dataList_float, dataNames):
     
-    for name, data in zip(dataNames, dataList_object):
+    for name, data in zip(dataNames, dataList_float):
 
         for col in data.columns:
+                        
+            print("col = ", col)
+            
+            # Scatter plot - qqplot (voir la distribution par rapport à une distribution considérée comme normale)
+            # Création d'une série avec des valeurs
+            serie = data[col]
+
+            # Suppression des valeurs NaN
+            serie_sans_nan = serie.dropna()
+            print(len(serie_sans_nan))
+
+            # Trier les valeurs
+            serie_sans_nan_sorted = np.sort(serie_sans_nan)
+
+            # Tracé du QQ plot
+            sm.qqplot(serie_sans_nan_sorted, line ='45') 
+            plt.title(f'qqplot des {col}')
+            plt.savefig(f'../graphics/{name}/qqplot_{col}.png')
             
             plt.figure(figsize=(9, 9))
-            plt.hist(data[col])
+            plt.hist(data[col].dropna(), bins=100, density=True, label="histogramme")
             plt.title(f'Histogramme des {col}')
             plt.xlabel('Variables')
             plt.ylabel('Effectifs')
             plt.savefig(f'../graphics/{name}/histogramme_{col}.png')
             
+            print("terminer")
+            
 
-#columns_object = ['agents', "criteria", 'lots']
+dataNames = ['agents', "criteria", 'lots']
 #graphics_quan(dataList_float64, dataNames)
 
 # Analyse descriptive bi-variée
@@ -157,39 +181,52 @@ plt.show()
 
 # Scatter plot entre une variable quali et une variable quanti
 # Création du scatter plot avec Seaborn
-'''
 def scatter(dataList, dataNames):
     
-    for data,name in zip(dataList, dataNames):
+    for data,names in zip(dataList, dataNames):   
         
-        for i in range(data.shape[0]-1):
+        print("names = ", names)
+        
+        data_copy = data.copy()   
+        print(data.columns)
+        
+        if(len(list(data.columns))<2):
+            continue
+        
+        for i in range(data_copy.shape[1]-1):
+            
+            print("i = ", i)
             
             col1 = data.columns[i]
+            data_copy.dropna(subset=[col1], inplace=True) 
             
             print("col1 = ", col1)
             
-            for j in range(i+1,data.shape[0]):
+            for j in range(i+1,data_copy.shape[1]):
                 
-                col2 = data.columns[j]
+                print("j = ", j)
+                
+                col2 = data_copy.columns[j]
+                data_copy.dropna(subset=[col2], inplace=True) 
                 
                 print("col2 = ", col2)
         
                 plt.figure(figsize=(8, 20))
-                sns.scatterplot(data=data, x=col1, y=col2, palette='viridis')
+                sns.scatterplot(data=data_copy, x=col1, y=col2, palette='viridis')
 
                 # Ajout des titres et des étiquettes
                 plt.title(f'{col2} en fonction de la {col1}')
                 plt.xlabel(f'{col1}')
                 plt.ylabel(f'{col2}')
-                plt.savefig('../graphics/agents/scatter_{col1}_{col2}.png')
+                plt.savefig(f'../graphics/{names}/scatter_{col1}-{col2}.png')
 
                 # Affichage du scatter plot
                 plt.show()
 
 dataList = [agents, lots]
-dataNames = ['agents', 'lots']
-scatter(dataList, dataNames)
-'''
+dataNames = ['agents', 'criteria', 'lots']
+scatter(dataList_float64, dataNames)
+
 ###############################################################################
 
 # Bloxplot: une variable quali et une variable quanti
@@ -230,7 +267,7 @@ def boxplots(dataList, dataNames):
 
 dataList = [agents, criteria, lots]
 dataNames = ["agents", "criteria", "lots"]
-#boxplots(dataList, dataNames)
+boxplots(dataList, dataNames)
                 
 ###############################################################################
 
@@ -270,9 +307,11 @@ def khi_2(dataListObject, dataNames):
                     print(f"Une erreur s'est produite : {e}")
                 
     return dict_khi_2
-        
+
+"""      
 dataNames = ['agents', "criteria", 'lots', 'name']
 dict_khi_2 = khi_2(dataList_object, dataNames)
+"""
 
 ###############################################################################
 
@@ -303,8 +342,10 @@ def pearson(dataList_float64, dataNames):
     
     return dict_pearson
 
+"""
 dataNames = ['agents', "criteria", 'lots']
 dict_pearson = pearson(dataList_float64, dataNames)
+"""
 
 ###############################################################################
 
@@ -354,20 +395,49 @@ def anova(dataList, dataNames):
                 print("p-valeur :", result.pvalue)
                 dict_anova[names][f"({col_object}, {col_float})"] = [result.statistic, result.pvalue]
 
+    return dict_anova
+    
+"""
 dataList = [agents, criteria, lots]
 dataNames = ["agents", "criteria", "lots"]
 dict_anova = anova(dataList, dataNames)
+"""
 
+# Usage de IsolationForest pour détecter les valeurs aberrantes
+def outliers(dataList_float, dataNames):
+    
+    for name, data in zip(dataNames, dataList_float):
 
+        for col in data.columns:
+                        
+            print("col = ", col)
 
+            # n_estimators: nombre d'arbre dans la forêt
+            # max_samples: nombre d'échantillon à utiliser
+            # contamination: prop de valeur aberrantes attendue
+            model = IsolationForest(n_estimators=100,max_samples='auto',contamination=0.001)
+            dfx = data[[col]]
+            dfx = pd.DataFrame(dfx[col].dropna())
+            model.fit(dfx[[col]])
+            dfx["scores"] = model.decision_function(dfx[[col]])
+            dfx["anomalies"] = model.predict(dfx[[col]])
+            # si la variable "anomalies" donne -1
+            # alors l'individu est anormal
+            
+            dfx = dfx[dfx["anomalies"]==1]
+            
+            plt.figure(figsize=(9, 9))
+            plt.hist(dfx, bins=20)
+            plt.title(f'Histogramme des {col}')
+            plt.xlabel('Variables')
+            plt.ylabel('Effectifs')
+            plt.show()
 
+    return dfx
 
+dataNames = ['agents', "criteria", 'lots']
+df1 = outliers(dataList_float64, dataNames)
 
-
-
-
-
-
-
+df1.shape()
 
 
