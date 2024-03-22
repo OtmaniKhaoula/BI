@@ -2,7 +2,7 @@
 """
 Created on Fri Feb 16 09:26:06 2024
 
-@author: Elisa Martin
+@author: Amarat Rim & Otmani Khaoula & Elisa Martin
 """
 
 import pandas as pd
@@ -26,29 +26,6 @@ lotSuppliers = pd.read_csv("../data/LotSuppliers.csv", sep=",")
 name = pd.read_csv("../data/Names.csv", sep=",")
 
 """
-dataList = [lotSuppliers, criteria, lots, agents, name]
-idx = [["lotId", "agentId"], "lotId", "lotId", "agentId", "agentId"]
-
-# Concaténation des tables 
-def concat(cible, dataList, idx):
-    data_complete = cible
-    for data, on in zip(dataList, idx):
-        print(data.columns)
-        data_complete = pd.merge(data_complete, data, on=on)
-        print("complete = ", data_complete.shape)
-        # Supprimer les lignes dupliquées
-        data_complete = data_complete.drop_duplicates()
-        data_complete.reset_index(drop=True, inplace=True)
-    return data_complete
-        
-new_data = concat(lotBuyers, dataList, idx)
-
-# tedCanId, awardDate, cpv
-columns_float = ["longitude", "latitude", "correctionsNb", "awardEstimatedPrice", "awardPrice", "numberTenders", "lotsNumber", "numberTendersSme", "contractDuration", "publicityDuration", "weight"]
-columns_object = ["name", "address", "city", "zipcode", "country", "department", "cancelled", "onBehalf", "PointProcurement", "fraAgreement", "fraEstimated", "accelerated", "outOfDirectives", "contractorSme", "subContracted", "gpa", "multipleCae", "typeOfContract", "topType", "renewal", "name_x", "type", "name_y"]
-"""
-
-"""
 Identifiez la nature de la variable, ainsi que son codage. Discutez-les, notamment si
 vous jugez que le codage n’est pas approprié.
 
@@ -63,8 +40,6 @@ dataNames = ["agents", "criteria", "lotBuyers", "lots", "lotSuppliers", "name"]
 describe = {}
 for names, data in zip(dataNames, dataList):
     
-    print(data)
-    
     if(names == "agents"):      
         data['siret'] = data['siret'].fillna(0)
         data['siret'] = data['siret'].astype('int64')
@@ -75,8 +50,7 @@ for names, data in zip(dataNames, dataList):
         data['cpv'] = data['cpv'].fillna(0)
         data['cpv'] = data['cpv'].astype('int64')
         data['correctionsNb'] = data['correctionsNb'].astype('float64')
-        data['cancelled'] = data['cancelled'].astype('float64')
-        #print("aaa = ", data.shape)
+        data["cancelled"] = data["cancelled"].replace({0: False, 1: True})
         data["outOfDirectives"] = data["outOfDirectives"].replace({0: False, 1: True})
         #print("bbb = ", data.shape)
     
@@ -90,11 +64,11 @@ for names, data in zip(dataNames, dataList):
     if data_float64.shape[1] > 0:
         describe[names]["describe"] = data_float64.describe()
         dataList_float64.append(data_float64)
-    data_object = data.select_dtypes(include=['object', 'int64'])
+    data_object = data.select_dtypes(include=['object', 'int64', 'bool'])
     # Description pour variables de type float64
     if data_object.shape[1] > 0:
-        if data_object.select_dtypes(include=['object']).shape[1] > 0:
-            dataList_object.append(data_object.select_dtypes(include=['object']))
+        if data_object.select_dtypes(include=['object', 'bool']).shape[1] > 0:
+            dataList_object.append(data_object.select_dtypes(include=['object', 'bool']))
         describe[names]["values"] = {}
         describe[names]["value_counts"] = {}
         for col in data_object.columns:
@@ -109,7 +83,6 @@ Produisez un graphique montrant la distribution de la variable, et discutez-le. 
 d’une distribution standard, et si oui laquelle ?
 https://jhub.cnam.fr/doc/notebooks/Representation_graphique_Python_Matplotlib.html
 """
-
 # Graphiques pour les variables quali (de type object)
 def graphics_qual(dataList_object, dataNames):
     
@@ -125,17 +98,19 @@ def graphics_qual(dataList_object, dataNames):
                
                 # Récupération des valeurs de la série
                 values = pd.Series(frequence_valeurs.values)
+                print("values = ", values)
                 title = f'Effectifs de la fréquence des modalités pour la variable {col}'
                 #print(values)
                 
                 plt.figure(figsize=(9, 9))
-                plt.hist(values, bins = int(max(values.values)/10), label="histogramme")
+                plt.hist(values, bins = 10, label="histogramme")
                 plt.title(title)
                 plt.xlabel('Variables')
                 plt.ylabel('Effectifs')
-                plt.ylim(0, max(frequence_valeurs.value_counts())*1.2)
+                #plt.ylim(0, max(frequence_valeurs.value_counts())*1.2)
+                plt.yscale('log')
                 plt.savefig(f'../graphics/{name}/histogramme_{col}.png')
-                
+                plt.close()                
                 
             else:
                 # Sélectionner les 20 variables les plus fréquentes
@@ -151,40 +126,12 @@ def graphics_qual(dataList_object, dataNames):
                 plt.xticks(x_pos, frequence_valeurs.index, rotation=90, fontsize=8)
                 plt.xlabel('Variables')
                 plt.ylabel('Effectifs')
-                plt.ylim(0, max(frequence_valeurs)*1.2)
-                #plt.show()
+                #plt.ylim(0, max(frequence_valeurs)*1.2)
                 plt.savefig(f'../graphics/{name}/barplot_{col}.png')
-                
-            
-            print("affichage intermédiaire")
-            """
-            if(len(frequence_valeurs)>10):
-                # Regrouper les autres variables sous une catégorie "Autres"
-                autres_effectifs = frequence_valeurs.iloc[10:].sum()
-                # Créer une série contenant les 19 valeurs les plus fréquentes et la valeur "Autres"
-                top_10_series = top_10_frequences.append(pd.Series(autres_effectifs, index=['Autres']))
-            """
-            #print("top_10_series = ", top_10_series)
-            
-            #print(col)
-            
-            #print("cercle")
-            #explode = (0, 0.2, 0, 0, 0) # on isole seulement la deuxième part (c.a.d 'solid')
-            """
-            labels = values.index
-            proportion_pattern = values
-            fig, ax = plt.subplots(figsize=(18, 18))
-            ax.pie(proportion_pattern, labels=labels, #explode=explode, 
-                   autopct='%1.1f%%', shadow=True, startangle=90)
-            ax.axis('equal')
-            plt.title(f'Répartition des {col}', fontsize=14)
-            #plt.show()
-            plt.savefig(f'../graphics/{name}/cercle_{col}.png')
-            print("terminé")
-            """
+                plt.close()
             
 columns_object = ['agents', "criteria", 'lots', 'name']
-graphics_qual(dataList_object, columns_object)
+#graphics_qual(dataList_object, columns_object)
 
 # Graphiques pour les variables quanti (de type float64)
 def graphics_quan(dataList_float, dataNames):
@@ -202,80 +149,31 @@ def graphics_quan(dataList_float, dataNames):
             # Suppression des valeurs NaN
             serie_sans_nan = serie.dropna()
             print(len(serie_sans_nan))
-
-            # Trier les valeurs
-            serie_sans_nan_sorted = np.sort(serie_sans_nan)
-
-            # Tracé du QQ plot
-            sm.qqplot(serie_sans_nan_sorted, line ='45') 
-            plt.title(f'qqplot des {col}')
-            plt.savefig(f'../graphics/{name}/qqplot_{col}.png')
-            
-            """
-            sns.distplot(data[col])
-            plt.title(f'displot des {col}')
-            plt.savefig(f'../graphics/{name}/displot_{col}.png')
-            """
             
             sns.stripplot(x = col, data = data, jitter = True)
             plt.title(f'stripplot des {col}')
             plt.savefig(f'../graphics/{name}/stripplot_{col}.png')
+            plt.close()
             
             plt.figure(figsize=(9, 9))
-            plt.hist(data[col].dropna(), bins=100, density=True, label="histogramme")
+            plt.hist(data[col].dropna())
             plt.title(f'Histogramme des {col}')
             plt.xlabel('Variables')
             plt.ylabel('Effectifs')
             plt.savefig(f'../graphics/{name}/histogramme_{col}.png')
+            plt.close()
             
             print("terminer")
             
-
 dataNames = ['agents', "criteria", 'lots']
 #graphics_quan(dataList_float64, dataNames)
 
-# Analyse descriptive bi-variée
 """
-# Barplot: graphe entre deux variables quali
-def barplot(dataList_object, dataNames):
-    
-    for data,names in zip(dataList_object, dataNames):
-        
-        if(len(list(data.columns))<2):
-            continue
-        
-        for i in range(data.shape[1]-1):
-            
-            col1 = data.columns[i]
-            
-            for j in range(i+1,data.shape[1]):
-                
-                col2 = data.columns[j]
-                
-                # Affichage du heatmap
-                plt.figure(figsize=(9, 9))
-                
-                if(data[col1].nunique() > 20 or data[col2].nunique() > 20):
-                    continue
-
-                sns.heatmap(pd.crosstab(data[col1], data[col2]), annot = True)
-
-                # Ajout des titres et des étiquettes
-                plt.title('heatmap')
-                plt.xlabel(col1)
-                plt.ylabel(col2)
-                
-                plt.savefig(f'../graphics/{name}/heatmap_{col}.png')
-
-                # Affichage du heatmap
-                # plt.show()
-                
-dataNames = ['criteria', 'lots']
-#barplot(dataList_object[1:3], dataNames)  
-"""        
+# Analyse descriptive bi-variée   
+"""
 
 # Barplot: graphe entre deux variables quali avec les effectifs de la fréquence des modalités dans l'axe des abscisses
-def barplot2(dataList_object, dataNames):
+def barplot(dataList_object, dataNames):
     
     for data,names in zip(dataList_object, dataNames):
         
@@ -304,6 +202,9 @@ def barplot2(dataList_object, dataNames):
                 counts1 = serie1.value_counts()
                 counts2 = serie2.value_counts()
                 
+                """
+                Je pense que faire un graphique si on a trop de modalités sur les deux variables catégorielles n'est pas très pertinent
+                """
                 if(data[col1].nunique() > 20 and data[col2].nunique() > 20):
                     
                     # Récupération des valeurs de la série
@@ -312,7 +213,7 @@ def barplot2(dataList_object, dataNames):
                     df = df.dropna()
                     #print(df)
                     
-                    plt.figure(figsize=(8, 20))
+                    plt.figure()
                     sns.scatterplot(data=df, x=col1, y=col2, palette='viridis')
 
                     # Ajout des titres et des étiquettes
@@ -320,6 +221,7 @@ def barplot2(dataList_object, dataNames):
                     plt.xlabel(f'{col1}', fontsize=20)
                     plt.ylabel(f'{col2}', fontsize=20)
                     plt.savefig(f'../graphics/{names}/scatter_{col1}-{col2}.png')
+                    plt.close()
 
                 
                 elif(data[col1].nunique() > 20):
@@ -340,6 +242,7 @@ def barplot2(dataList_object, dataNames):
                     plt.ylabel(f'{col1}', fontsize=20)
                     plt.xticks(rotation=45,fontsize=18)
                     plt.savefig(f'../graphics/{names}/boxplot_{col1}-{col2}.png')
+                    plt.close()
                     
                 elif(data[col2].nunique() > 20):
                     
@@ -358,6 +261,7 @@ def barplot2(dataList_object, dataNames):
                     plt.ylabel(f'{col1}', fontsize=20)
                     plt.xticks(rotation=45, fontsize=18)
                     plt.savefig(f'../graphics/{names}/boxplot_{col1}-{col2}.png')
+                    plt.close()
 
                 else:
                     # Créer un tableau croisé des deux variables
@@ -375,35 +279,11 @@ def barplot2(dataList_object, dataNames):
 
                     # Sauvegarde du plot
                     plt.savefig(f'../graphics/{names}/barplot_{col1}_{col2}.png')
+                    plt.close()
        
 columns_object = ['agents', "criteria", 'lots', 'name']
-barplot2(dataList_object, columns_object)                              
+#barplot(dataList_object, columns_object)                              
 
-"""
-data = dataList_object[2]
-
-# Création de la table de données pour la heatmap
-#heatmap_data = data.pivot_table(index=data.columns[0], columns=data.columns[3], aggfunc=len, fill_value=0)
-
-# Affichage du heatmap
-plt.figure(figsize=(9, 9))
-#sns.factorplot(x = data.columns[0], col =  data.columns[1], data = data, kind = "count")
-#sns.catplot(x = data.columns[0], hue = data.columns[1], data = data, kind = "count")
-#with sns.axes_style('white'):
-#    g = sns.factorplot(data.columns[2], data=data, aspect=4.0, kind='count',
-#                       hue=data.columns[3])
-#    g.set_ylabels('Number of Planets Discovered')
-sns.heatmap(pd.crosstab(data[data.columns[1]], data[data.columns[2]]), annot = True)
-#sns.heatmap(heatmap_data, annot=True, cmap='coolwarm', fmt='d')
-
-# Ajout des titres et des étiquettes
-plt.title('factorplot')
-plt.xlabel(data.columns[1])
-plt.ylabel(data.columns[2])
-
-# Affichage du heatmap
-plt.show()
-"""
 #agents.dropna(subset=['longitude', 'latitude'], inplace=True)
 
 # Scatter plot entre une variable quali et une variable quanti
@@ -438,7 +318,7 @@ def scatter(dataList, dataNames):
                 
                 # print("col2 = ", col2)                
         
-                plt.figure(figsize=(8, 20))
+                plt.figure()
                 sns.scatterplot(data=data_copy, x=col1, y=col2, palette='viridis')
 
                 # Ajout des titres et des étiquettes
@@ -446,6 +326,7 @@ def scatter(dataList, dataNames):
                 plt.xlabel(f'{col1}')
                 plt.ylabel(f'{col2}')
                 plt.savefig(f'../graphics/{names}/scatter_{col1}-{col2}.png')
+                plt.close()
 
                 # Affichage du scatter plot
                 plt.show()
@@ -494,14 +375,15 @@ def boxplots(dataList, dataNames):
                     df = df.dropna()
                     #print(df)
                     
-                    plt.figure(figsize=(8, 20))
+                    plt.figure()
                     sns.scatterplot(data=df, x=col1, y=col2, palette='viridis')
 
                     # Ajout des titres et des étiquettes
-                    plt.title(f'{col2} en fonction de la {col1}', fontsize=25)
+                    plt.title(f'{col2} en fonction de {col1}', fontsize=25)
                     plt.xlabel(f'{col1}', fontsize=20)
                     plt.ylabel(f'{col2}', fontsize=20)
                     plt.savefig(f'../graphics/{names}/scatter_{col1}-{col2}.png')
+                    plt.close()
                     
                     continue
                               
@@ -517,13 +399,18 @@ def boxplots(dataList, dataNames):
                 plt.ylabel('Valeur')
                 plt.xticks(rotation=90)
                 plt.savefig(f'../graphics/{names}/boxplot_{col1}-{col2}.png')
+                plt.close()
                 
 dataList = [agents, criteria, lots]
 dataNames = ["agents", "criteria", "lots"]
-boxplots(dataList, dataNames)
+#boxplots(dataList, dataNames)
                 
 ###############################################################################
-
+"""
+α = 0,05 lors du test d'indépendance
+Dans ce cas, vous avez décidé de prendre un risque de 5 % de conclure que les
+deux variables sont indépendantes alors qu'en réalité elles ne le sont pas
+"""
 # Test de khi-2 sur les données catégorielles
 def khi_2(dataListObject, dataNames):
     
@@ -562,7 +449,9 @@ def khi_2(dataListObject, dataNames):
     return dict_khi_2
 
 dataNames = ['agents', "criteria", 'lots', 'name']
-#dict_khi_2 = khi_2(dataList_object, dataNames)
+dict_khi_2 = khi_2(dataList_object, dataNames)
+
+# Si V-Cramer = nan: ça vient d'une colonne qui a une seule modalité
 
 ###############################################################################
 
@@ -594,13 +483,15 @@ def pearson(dataList_float64, dataNames):
     return dict_pearson
 
 dataNames = ['agents', "criteria", 'lots']
-#dict_pearson = pearson(dataList_float64, dataNames)
+dict_pearson = pearson(dataList_float64, dataNames)
 
 ###############################################################################
 
 # Corrélation entre une variable quali et une quanti
 # ex: country et la latitude
 # https://datascientest.com/correlation-entre-variables-comment-mesurer-la-dependance
+# Peut petre utilisé une fois normalisé? 
+# A revoir avec kruskal
 
 def anova(dataList, dataNames):
     
@@ -681,11 +572,13 @@ def outliers(dataList_float, dataNames):
             plt.ylabel('Effectifs')
             #plt.show()
             plt.savefig(f'../graphics/{names}/histogramme_without_outliers_{col}.png')
+            plt.close()
 
     return dfx
 
 dataNames = ['agents', "criteria", 'lots']
-#outliers(dataList_float64, dataNames)
+#dfx = outliers(dataList_float64, dataNames)
 
+#plt.yscale('log')
 
 
