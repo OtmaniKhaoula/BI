@@ -182,11 +182,21 @@ def edges_grouped_in_region(edges):
     output = ["Source;Target;Type;Id;Weight"]
     #1 node = 1 author
     # wirte id and label columns
+    map_count_weight = {}
+
     index = 0
     for x in tqdm(range(len(edges))):
-        a1 = region_to_number[french_departments[edges[x][1]]]
-        a2 = region_to_number[french_departments[edges[x][0]]]
-        output.append(str(a1)+";"+str(a2)+";"+"Directed;"+str(index)+';'+str(edges[x][2]))
+        #print(edges[x])
+        
+        nodes_str = str(region_to_number[french_departments[edges[x][1]]]) + ";" + str(region_to_number[french_departments[edges[x][0]]])
+        if nodes_str not in map_count_weight:
+            map_count_weight[nodes_str] = int(edges[x][2])
+        else:
+            map_count_weight[nodes_str] += int(edges[x][2])
+
+    for key in map_count_weight:
+        output.append(key+";"+"Directed;"+str(index)+';'+str(map_count_weight[key]))
+
         index += 1
 
     with open('../data/graphs/edges/paca-edges_'+str(uid)+'.csv', 'w') as f:
@@ -284,6 +294,7 @@ def main():
 
         print(edges_qry) 
         edges = c.execute(edges_qry).fetchall()
+        print(edges)
 
         nodes_csv(nodes)
         edges_csv(edges)
@@ -298,6 +309,7 @@ def main():
 
         print(edges_qry) 
         edges = c.execute(edges_qry).fetchall()
+
 
         node_grouped_in_regions(nodes)
         edges_grouped_in_region(edges)

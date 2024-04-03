@@ -1,0 +1,164 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 600px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#11787F", "id": 75, "label": "Nouvelle-Aquitaine  0", "shape": "dot"}, {"color": "#FFF7A4", "id": 94, "label": "Corsica  1", "shape": "dot"}, {"color": "#11787F", "id": 11, "label": "Ile-de-France  0", "shape": "dot"}, {"color": "#FFF7A4", "id": 32, "label": "Hauts-de-France  1", "shape": "dot"}, {"color": "#FFF7A4", "id": 28, "label": "Normandy  1", "shape": "dot"}, {"color": "#FFF7A4", "id": 53, "label": "Brittany  1", "shape": "dot"}, {"color": "#EE8822", "id": 76, "label": "Occitanie  2", "shape": "dot"}, {"color": "#EE8822", "id": 84, "label": "Auvergne-Rhone-Alpes  2", "shape": "dot"}, {"color": "#FFF7A4", "id": 52, "label": "Pays de la Loire  1", "shape": "dot"}, {"color": "#EE8822", "id": 44, "label": "Grand Est  2", "shape": "dot"}, {"color": "#FFF7A4", "id": 24, "label": "Centre-Val de Loire  1", "shape": "dot"}, {"color": "#EE8822", "id": 93, "label": "Provence-Alpes-Cote d\u0027Azur  2", "shape": "dot"}, {"color": "#FFF7A4", "id": 27, "label": "Bourgogne-Franche-Comte  1", "shape": "dot"}, {"color": "#11787F", "id": 2, "label": "Martinique  0", "shape": "dot"}, {"color": "#11787F", "id": 4, "label": "Reunion  0", "shape": "dot"}, {"color": "#11787F", "id": 1, "label": "Guadeloupe  0", "shape": "dot"}, {"color": "#11787F", "id": 7, "label": "French Guiana  0", "shape": "dot"}, {"color": "#11787F", "id": 6, "label": "Mayotte  0", "shape": "dot"}, {"color": "#FFF7A4", "id": 8, "label": "Monaco  1", "shape": "dot"}, {"color": "#EE8822", "id": 9, "label": "Nouvelle-Caledonie  2", "shape": "dot"}, {"color": "#EE8822", "id": 10, "label": "Polynesie  2", "shape": "dot"}, {"color": "#11787F", "id": 12, "label": "Saint-Pierre-et-Miquelon  0", "shape": "dot"}, {"color": "#11787F", "id": 13, "label": "Saint-Barthelemy  0", "shape": "dot"}, {"color": "#EE8822", "id": 14, "label": "Wallis-et-Futuna  2", "shape": "dot"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": 84, "to": 84, "value": 99202}, {"arrows": "to", "from": 32, "to": 84, "value": 2300}, {"arrows": "to", "from": 93, "to": 84, "value": 3995}, {"arrows": "to", "from": 44, "to": 84, "value": 3605}, {"arrows": "to", "from": 76, "to": 84, "value": 3413}, {"arrows": "to", "from": 28, "to": 84, "value": 1041}, {"arrows": "to", "from": 75, "to": 84, "value": 3813}, {"arrows": "to", "from": 24, "to": 84, "value": 1535}, {"arrows": "to", "from": 27, "to": 84, "value": 2535}, {"arrows": "to", "from": 53, "to": 84, "value": 687}, {"arrows": "to", "from": 94, "to": 84, "value": 117}, {"arrows": "to", "from": 52, "to": 84, "value": 1588}, {"arrows": "to", "from": 11, "to": 84, "value": 21013}, {"arrows": "to", "from": 84, "to": 32, "value": 5224}, {"arrows": "to", "from": 32, "to": 32, "value": 69003}, {"arrows": "to", "from": 93, "to": 32, "value": 1545}, {"arrows": "to", "from": 44, "to": 32, "value": 3592}, {"arrows": "to", "from": 76, "to": 32, "value": 1496}, {"arrows": "to", "from": 28, "to": 32, "value": 2189}, {"arrows": "to", "from": 75, "to": 32, "value": 2297}, {"arrows": "to", "from": 24, "to": 32, "value": 954}, {"arrows": "to", "from": 27, "to": 32, "value": 660}, {"arrows": "to", "from": 53, "to": 32, "value": 848}, {"arrows": "to", "from": 94, "to": 32, "value": 11}, {"arrows": "to", "from": 52, "to": 32, "value": 1460}, {"arrows": "to", "from": 11, "to": 32, "value": 21300}, {"arrows": "to", "from": 84, "to": 93, "value": 7410}, {"arrows": "to", "from": 32, "to": 93, "value": 1700}, {"arrows": "to", "from": 93, "to": 93, "value": 59999}, {"arrows": "to", "from": 44, "to": 93, "value": 2048}, {"arrows": "to", "from": 76, "to": 93, "value": 5570}, {"arrows": "to", "from": 28, "to": 93, "value": 815}, {"arrows": "to", "from": 75, "to": 93, "value": 2519}, {"arrows": "to", "from": 24, "to": 93, "value": 741}, {"arrows": "to", "from": 27, "to": 93, "value": 740}, {"arrows": "to", "from": 53, "to": 93, "value": 825}, {"arrows": "to", "from": 52, "to": 93, "value": 1190}, {"arrows": "to", "from": 11, "to": 93, "value": 16791}, {"arrows": "to", "from": 94, "to": 93, "value": 384}, {"arrows": "to", "from": 2, "to": 93, "value": 5}, {"arrows": "to", "from": 4, "to": 93, "value": 18}, {"arrows": "to", "from": 8, "to": 93, "value": 41}, {"arrows": "to", "from": 14, "to": 93, "value": 4}, {"arrows": "to", "from": 10, "to": 93, "value": 10}, {"arrows": "to", "from": 9, "to": 93, "value": 44}, {"arrows": "to", "from": 84, "to": 44, "value": 6717}, {"arrows": "to", "from": 32, "to": 44, "value": 4215}, {"arrows": "to", "from": 93, "to": 44, "value": 1858}, {"arrows": "to", "from": 44, "to": 44, "value": 67384}, {"arrows": "to", "from": 28, "to": 44, "value": 1003}, {"arrows": "to", "from": 75, "to": 44, "value": 2568}, {"arrows": "to", "from": 24, "to": 44, "value": 989}, {"arrows": "to", "from": 27, "to": 44, "value": 3302}, {"arrows": "to", "from": 76, "to": 44, "value": 1516}, {"arrows": "to", "from": 53, "to": 44, "value": 779}, {"arrows": "to", "from": 52, "to": 44, "value": 1329}, {"arrows": "to", "from": 11, "to": 44, "value": 21517}, {"arrows": "to", "from": 2, "to": 44, "value": 12}, {"arrows": "to", "from": 32, "to": 76, "value": 1668}, {"arrows": "to", "from": 84, "to": 76, "value": 6753}, {"arrows": "to", "from": 93, "to": 76, "value": 5222}, {"arrows": "to", "from": 76, "to": 76, "value": 68129}, {"arrows": "to", "from": 75, "to": 76, "value": 6175}, {"arrows": "to", "from": 24, "to": 76, "value": 729}, {"arrows": "to", "from": 27, "to": 76, "value": 606}, {"arrows": "to", "from": 28, "to": 76, "value": 803}, {"arrows": "to", "from": 53, "to": 76, "value": 679}, {"arrows": "to", "from": 52, "to": 76, "value": 1345}, {"arrows": "to", "from": 44, "to": 76, "value": 2011}, {"arrows": "to", "from": 11, "to": 76, "value": 15269}, {"arrows": "to", "from": 4, "to": 76, "value": 121}, {"arrows": "to", "from": 94, "to": 76, "value": 26}, {"arrows": "to", "from": 1, "to": 93, "value": 6}, {"arrows": "to", "from": 7, "to": 93, "value": 2}, {"arrows": "to", "from": 84, "to": 28, "value": 2645}, {"arrows": "to", "from": 32, "to": 28, "value": 2139}, {"arrows": "to", "from": 93, "to": 28, "value": 728}, {"arrows": "to", "from": 44, "to": 28, "value": 1341}, {"arrows": "to", "from": 76, "to": 28, "value": 597}, {"arrows": "to", "from": 28, "to": 28, "value": 32397}, {"arrows": "to", "from": 75, "to": 28, "value": 1617}, {"arrows": "to", "from": 24, "to": 28, "value": 1067}, {"arrows": "to", "from": 27, "to": 28, "value": 360}, {"arrows": "to", "from": 53, "to": 28, "value": 1827}, {"arrows": "to", "from": 94, "to": 28, "value": 3}, {"arrows": "to", "from": 52, "to": 28, "value": 1900}, {"arrows": "to", "from": 11, "to": 28, "value": 10393}, {"arrows": "to", "from": 84, "to": 75, "value": 7372}, {"arrows": "to", "from": 93, "to": 75, "value": 2103}, {"arrows": "to", "from": 76, "to": 75, "value": 6582}, {"arrows": "to", "from": 44, "to": 75, "value": 3121}, {"arrows": "to", "from": 28, "to": 75, "value": 1143}, {"arrows": "to", "from": 75, "to": 75, "value": 65032}, {"arrows": "to", "from": 24, "to": 75, "value": 2290}, {"arrows": "to", "from": 27, "to": 75, "value": 714}, {"arrows": "to", "from": 53, "to": 75, "value": 1426}, {"arrows": "to", "from": 52, "to": 75, "value": 4524}, {"arrows": "to", "from": 32, "to": 75, "value": 2357}, {"arrows": "to", "from": 11, "to": 75, "value": 21653}, {"arrows": "to", "from": 94, "to": 75, "value": 38}, {"arrows": "to", "from": 1, "to": 75, "value": 19}, {"arrows": "to", "from": 2, "to": 75, "value": 20}, {"arrows": "to", "from": 4, "to": 75, "value": 15}, {"arrows": "to", "from": 8, "to": 75, "value": 3}, {"arrows": "to", "from": 84, "to": 24, "value": 3580}, {"arrows": "to", "from": 32, "to": 24, "value": 1030}, {"arrows": "to", "from": 93, "to": 24, "value": 895}, {"arrows": "to", "from": 76, "to": 24, "value": 1086}, {"arrows": "to", "from": 44, "to": 24, "value": 1401}, {"arrows": "to", "from": 28, "to": 24, "value": 1011}, {"arrows": "to", "from": 75, "to": 24, "value": 2517}, {"arrows": "to", "from": 24, "to": 24, "value": 22509}, {"arrows": "to", "from": 27, "to": 24, "value": 647}, {"arrows": "to", "from": 53, "to": 24, "value": 790}, {"arrows": "to", "from": 94, "to": 24, "value": 16}, {"arrows": "to", "from": 52, "to": 24, "value": 2202}, {"arrows": "to", "from": 11, "to": 24, "value": 11540}, {"arrows": "to", "from": 94, "to": 94, "value": 6769}, {"arrows": "to", "from": 11, "to": 94, "value": 1217}, {"arrows": "to", "from": 84, "to": 27, "value": 6286}, {"arrows": "to", "from": 32, "to": 27, "value": 1217}, {"arrows": "to", "from": 93, "to": 27, "value": 1142}, {"arrows": "to", "from": 44, "to": 27, "value": 4158}, {"arrows": "to", "from": 76, "to": 27, "value": 1046}, {"arrows": "to", "from": 28, "to": 27, "value": 504}, {"arrows": "to", "from": 75, "to": 27, "value": 1179}, {"arrows": "to", "from": 24, "to": 27, "value": 1130}, {"arrows": "to", "from": 27, "to": 27, "value": 28417}, {"arrows": "to", "from": 53, "to": 27, "value": 390}, {"arrows": "to", "from": 94, "to": 27, "value": 6}, {"arrows": "to", "from": 52, "to": 27, "value": 569}, {"arrows": "to", "from": 11, "to": 27, "value": 10472}, {"arrows": "to", "from": 2, "to": 27, "value": 3}, {"arrows": "to", "from": 7, "to": 27, "value": 1}, {"arrows": "to", "from": 8, "to": 27, "value": 4}, {"arrows": "to", "from": 84, "to": 53, "value": 3396}, {"arrows": "to", "from": 32, "to": 53, "value": 1451}, {"arrows": "to", "from": 93, "to": 53, "value": 1462}, {"arrows": "to", "from": 44, "to": 53, "value": 1445}, {"arrows": "to", "from": 76, "to": 53, "value": 1028}, {"arrows": "to", "from": 28, "to": 53, "value": 1392}, {"arrows": "to", "from": 75, "to": 53, "value": 2187}, {"arrows": "to", "from": 24, "to": 53, "value": 1104}, {"arrows": "to", "from": 27, "to": 53, "value": 412}, {"arrows": "to", "from": 53, "to": 53, "value": 29751}, {"arrows": "to", "from": 52, "to": 53, "value": 5664}, {"arrows": "to", "from": 11, "to": 53, "value": 14647}, {"arrows": "to", "from": 8, "to": 53, "value": 5}, {"arrows": "to", "from": 9, "to": 53, "value": 65}, {"arrows": "to", "from": 9, "to": 75, "value": 16}, {"arrows": "to", "from": 2, "to": 84, "value": 3}, {"arrows": "to", "from": 8, "to": 84, "value": 6}, {"arrows": "to", "from": 9, "to": 84, "value": 10}, {"arrows": "to", "from": 1, "to": 24, "value": 2}, {"arrows": "to", "from": 94, "to": 53, "value": 21}, {"arrows": "to", "from": 1, "to": 53, "value": 1}, {"arrows": "to", "from": 2, "to": 53, "value": 3}, {"arrows": "to", "from": 4, "to": 53, "value": 4}, {"arrows": "to", "from": 6, "to": 53, "value": 1}, {"arrows": "to", "from": 84, "to": 94, "value": 473}, {"arrows": "to", "from": 32, "to": 94, "value": 129}, {"arrows": "to", "from": 93, "to": 94, "value": 592}, {"arrows": "to", "from": 44, "to": 94, "value": 165}, {"arrows": "to", "from": 28, "to": 94, "value": 27}, {"arrows": "to", "from": 75, "to": 94, "value": 168}, {"arrows": "to", "from": 24, "to": 94, "value": 85}, {"arrows": "to", "from": 27, "to": 94, "value": 24}, {"arrows": "to", "from": 53, "to": 94, "value": 34}, {"arrows": "to", "from": 76, "to": 94, "value": 214}, {"arrows": "to", "from": 52, "to": 94, "value": 47}, {"arrows": "to", "from": 2, "to": 94, "value": 1}, {"arrows": "to", "from": 9, "to": 94, "value": 2}, {"arrows": "to", "from": 8, "to": 94, "value": 2}, {"arrows": "to", "from": 7, "to": 76, "value": 1}, {"arrows": "to", "from": 14, "to": 76, "value": 2}, {"arrows": "to", "from": 7, "to": 75, "value": 8}, {"arrows": "to", "from": 1, "to": 76, "value": 2}, {"arrows": "to", "from": 2, "to": 76, "value": 2}, {"arrows": "to", "from": 10, "to": 76, "value": 1}, {"arrows": "to", "from": 9, "to": 76, "value": 1}, {"arrows": "to", "from": 4, "to": 24, "value": 1}, {"arrows": "to", "from": 8, "to": 24, "value": 3}, {"arrows": "to", "from": 9, "to": 24, "value": 2}, {"arrows": "to", "from": 4, "to": 27, "value": 1}, {"arrows": "to", "from": 4, "to": 84, "value": 4}, {"arrows": "to", "from": 10, "to": 84, "value": 1}, {"arrows": "to", "from": 84, "to": 52, "value": 3303}, {"arrows": "to", "from": 32, "to": 52, "value": 1257}, {"arrows": "to", "from": 93, "to": 52, "value": 1123}, {"arrows": "to", "from": 44, "to": 52, "value": 1519}, {"arrows": "to", "from": 76, "to": 52, "value": 1068}, {"arrows": "to", "from": 28, "to": 52, "value": 1238}, {"arrows": "to", "from": 75, "to": 52, "value": 3060}, {"arrows": "to", "from": 24, "to": 52, "value": 1481}, {"arrows": "to", "from": 27, "to": 52, "value": 352}, {"arrows": "to", "from": 53, "to": 52, "value": 3866}, {"arrows": "to", "from": 94, "to": 52, "value": 10}, {"arrows": "to", "from": 52, "to": 52, "value": 40173}, {"arrows": "to", "from": 11, "to": 52, "value": 11997}, {"arrows": "to", "from": 2, "to": 52, "value": 5}, {"arrows": "to", "from": 8, "to": 52, "value": 5}, {"arrows": "to", "from": 2, "to": 24, "value": 3}, {"arrows": "to", "from": 14, "to": 24, "value": 1}, {"arrows": "to", "from": 1, "to": 52, "value": 3}, {"arrows": "to", "from": 7, "to": 52, "value": 1}, {"arrows": "to", "from": 4, "to": 52, "value": 2}, {"arrows": "to", "from": 94, "to": 44, "value": 31}, {"arrows": "to", "from": 8, "to": 44, "value": 3}, {"arrows": "to", "from": 14, "to": 44, "value": 3}, {"arrows": "to", "from": 1, "to": 44, "value": 9}, {"arrows": "to", "from": 7, "to": 44, "value": 9}, {"arrows": "to", "from": 4, "to": 44, "value": 16}, {"arrows": "to", "from": 10, "to": 44, "value": 9}, {"arrows": "to", "from": 9, "to": 44, "value": 18}, {"arrows": "to", "from": 9, "to": 27, "value": 1}, {"arrows": "to", "from": 4, "to": 32, "value": 47}, {"arrows": "to", "from": 8, "to": 32, "value": 4}, {"arrows": "to", "from": 2, "to": 32, "value": 1}, {"arrows": "to", "from": 10, "to": 32, "value": 1}, {"arrows": "to", "from": 7, "to": 32, "value": 1}, {"arrows": "to", "from": 14, "to": 75, "value": 1}, {"arrows": "to", "from": 1, "to": 84, "value": 7}, {"arrows": "to", "from": 84, "to": 11, "value": 16321}, {"arrows": "to", "from": 32, "to": 11, "value": 9572}, {"arrows": "to", "from": 93, "to": 11, "value": 5966}, {"arrows": "to", "from": 44, "to": 11, "value": 7362}, {"arrows": "to", "from": 76, "to": 11, "value": 6599}, {"arrows": "to", "from": 28, "to": 11, "value": 4308}, {"arrows": "to", "from": 75, "to": 11, "value": 8083}, {"arrows": "to", "from": 24, "to": 11, "value": 5161}, {"arrows": "to", "from": 27, "to": 11, "value": 3119}, {"arrows": "to", "from": 53, "to": 11, "value": 3798}, {"arrows": "to", "from": 94, "to": 11, "value": 315}, {"arrows": "to", "from": 52, "to": 11, "value": 5438}, {"arrows": "to", "from": 11, "to": 11, "value": 167100}, {"arrows": "to", "from": 1, "to": 11, "value": 158}, {"arrows": "to", "from": 2, "to": 11, "value": 146}, {"arrows": "to", "from": 7, "to": 11, "value": 233}, {"arrows": "to", "from": 4, "to": 11, "value": 232}, {"arrows": "to", "from": 12, "to": 11, "value": 13}, {"arrows": "to", "from": 6, "to": 11, "value": 24}, {"arrows": "to", "from": 8, "to": 11, "value": 7}, {"arrows": "to", "from": 10, "to": 11, "value": 9}, {"arrows": "to", "from": 9, "to": 11, "value": 22}, {"arrows": "to", "from": 8, "to": 28, "value": 1}, {"arrows": "to", "from": 1, "to": 32, "value": 1}, {"arrows": "to", "from": 6, "to": 75, "value": 1}, {"arrows": "to", "from": 32, "to": 1, "value": 23}, {"arrows": "to", "from": 84, "to": 1, "value": 85}, {"arrows": "to", "from": 93, "to": 1, "value": 50}, {"arrows": "to", "from": 44, "to": 1, "value": 45}, {"arrows": "to", "from": 76, "to": 1, "value": 97}, {"arrows": "to", "from": 28, "to": 1, "value": 21}, {"arrows": "to", "from": 75, "to": 1, "value": 50}, {"arrows": "to", "from": 24, "to": 1, "value": 9}, {"arrows": "to", "from": 53, "to": 1, "value": 14}, {"arrows": "to", "from": 27, "to": 1, "value": 13}, {"arrows": "to", "from": 94, "to": 1, "value": 1}, {"arrows": "to", "from": 52, "to": 1, "value": 53}, {"arrows": "to", "from": 11, "to": 1, "value": 424}, {"arrows": "to", "from": 1, "to": 1, "value": 5825}, {"arrows": "to", "from": 2, "to": 1, "value": 332}, {"arrows": "to", "from": 7, "to": 1, "value": 72}, {"arrows": "to", "from": 4, "to": 1, "value": 276}, {"arrows": "to", "from": 6, "to": 1, "value": 17}, {"arrows": "to", "from": 8, "to": 1, "value": 1}, {"arrows": "to", "from": 84, "to": 2, "value": 198}, {"arrows": "to", "from": 32, "to": 2, "value": 40}, {"arrows": "to", "from": 93, "to": 2, "value": 73}, {"arrows": "to", "from": 76, "to": 2, "value": 65}, {"arrows": "to", "from": 44, "to": 2, "value": 69}, {"arrows": "to", "from": 28, "to": 2, "value": 15}, {"arrows": "to", "from": 75, "to": 2, "value": 87}, {"arrows": "to", "from": 24, "to": 2, "value": 24}, {"arrows": "to", "from": 27, "to": 2, "value": 13}, {"arrows": "to", "from": 53, "to": 2, "value": 11}, {"arrows": "to", "from": 52, "to": 2, "value": 31}, {"arrows": "to", "from": 11, "to": 2, "value": 793}, {"arrows": "to", "from": 1, "to": 2, "value": 438}, {"arrows": "to", "from": 2, "to": 2, "value": 5676}, {"arrows": "to", "from": 7, "to": 2, "value": 69}, {"arrows": "to", "from": 4, "to": 2, "value": 270}, {"arrows": "to", "from": 6, "to": 2, "value": 1}, {"arrows": "to", "from": 84, "to": 7, "value": 62}, {"arrows": "to", "from": 93, "to": 7, "value": 31}, {"arrows": "to", "from": 76, "to": 7, "value": 49}, {"arrows": "to", "from": 44, "to": 7, "value": 18}, {"arrows": "to", "from": 28, "to": 7, "value": 6}, {"arrows": "to", "from": 75, "to": 7, "value": 25}, {"arrows": "to", "from": 24, "to": 7, "value": 38}, {"arrows": "to", "from": 27, "to": 7, "value": 5}, {"arrows": "to", "from": 53, "to": 7, "value": 3}, {"arrows": "to", "from": 52, "to": 7, "value": 29}, {"arrows": "to", "from": 32, "to": 7, "value": 9}, {"arrows": "to", "from": 11, "to": 7, "value": 174}, {"arrows": "to", "from": 1, "to": 7, "value": 216}, {"arrows": "to", "from": 2, "to": 7, "value": 154}, {"arrows": "to", "from": 7, "to": 7, "value": 2720}, {"arrows": "to", "from": 4, "to": 7, "value": 76}, {"arrows": "to", "from": 12, "to": 7, "value": 1}, {"arrows": "to", "from": 6, "to": 7, "value": 3}, {"arrows": "to", "from": 84, "to": 4, "value": 233}, {"arrows": "to", "from": 93, "to": 4, "value": 89}, {"arrows": "to", "from": 76, "to": 4, "value": 438}, {"arrows": "to", "from": 44, "to": 4, "value": 110}, {"arrows": "to", "from": 28, "to": 4, "value": 30}, {"arrows": "to", "from": 75, "to": 4, "value": 173}, {"arrows": "to", "from": 24, "to": 4, "value": 45}, {"arrows": "to", "from": 27, "to": 4, "value": 20}, {"arrows": "to", "from": 53, "to": 4, "value": 23}, {"arrows": "to", "from": 52, "to": 4, "value": 69}, {"arrows": "to", "from": 32, "to": 4, "value": 37}, {"arrows": "to", "from": 11, "to": 4, "value": 866}, {"arrows": "to", "from": 1, "to": 4, "value": 628}, {"arrows": "to", "from": 2, "to": 4, "value": 292}, {"arrows": "to", "from": 7, "to": 4, "value": 88}, {"arrows": "to", "from": 4, "to": 4, "value": 16151}, {"arrows": "to", "from": 12, "to": 4, "value": 8}, {"arrows": "to", "from": 6, "to": 4, "value": 374}, {"arrows": "to", "from": 13, "to": 4, "value": 1}, {"arrows": "to", "from": 9, "to": 4, "value": 1}, {"arrows": "to", "from": 93, "to": 12, "value": 5}, {"arrows": "to", "from": 76, "to": 12, "value": 10}, {"arrows": "to", "from": 84, "to": 12, "value": 3}, {"arrows": "to", "from": 27, "to": 12, "value": 2}, {"arrows": "to", "from": 75, "to": 12, "value": 2}, {"arrows": "to", "from": 52, "to": 12, "value": 5}, {"arrows": "to", "from": 11, "to": 12, "value": 12}, {"arrows": "to", "from": 1, "to": 12, "value": 1}, {"arrows": "to", "from": 2, "to": 12, "value": 4}, {"arrows": "to", "from": 4, "to": 12, "value": 318}, {"arrows": "to", "from": 12, "to": 12, "value": 21}, {"arrows": "to", "from": 84, "to": 6, "value": 34}, {"arrows": "to", "from": 93, "to": 6, "value": 11}, {"arrows": "to", "from": 76, "to": 6, "value": 29}, {"arrows": "to", "from": 28, "to": 6, "value": 7}, {"arrows": "to", "from": 75, "to": 6, "value": 7}, {"arrows": "to", "from": 24, "to": 6, "value": 14}, {"arrows": "to", "from": 27, "to": 6, "value": 2}, {"arrows": "to", "from": 94, "to": 6, "value": 1}, {"arrows": "to", "from": 53, "to": 6, "value": 2}, {"arrows": "to", "from": 52, "to": 6, "value": 10}, {"arrows": "to", "from": 44, "to": 6, "value": 23}, {"arrows": "to", "from": 32, "to": 6, "value": 8}, {"arrows": "to", "from": 11, "to": 6, "value": 145}, {"arrows": "to", "from": 1, "to": 6, "value": 102}, {"arrows": "to", "from": 2, "to": 6, "value": 39}, {"arrows": "to", "from": 7, "to": 6, "value": 34}, {"arrows": "to", "from": 4, "to": 6, "value": 157}, {"arrows": "to", "from": 6, "to": 6, "value": 444}, {"arrows": "to", "from": 10, "to": 14, "value": 1}, {"arrows": "to", "from": 93, "to": 10, "value": 1}, {"arrows": "to", "from": 84, "to": 10, "value": 7}, {"arrows": "to", "from": 53, "to": 10, "value": 1}, {"arrows": "to", "from": 11, "to": 10, "value": 4}, {"arrows": "to", "from": 10, "to": 10, "value": 27}, {"arrows": "to", "from": 9, "to": 10, "value": 4}, {"arrows": "to", "from": 44, "to": 9, "value": 1}, {"arrows": "to", "from": 11, "to": 9, "value": 5}, {"arrows": "to", "from": 9, "to": 9, "value": 15}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "forceAtlas2Based": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.01,
+            "damping": 0.4,
+            "gravitationalConstant": -50,
+            "springConstant": 0.08,
+            "springLength": 100
+        },
+        "solver": "forceAtlas2Based",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
