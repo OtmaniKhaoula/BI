@@ -9,7 +9,7 @@ import subprocess
 
 # Liste des chemins vers les fichiers Python à exécuter
 chemins_vers_scripts = [
-    "exploration_v2.py",
+    "exploration.py",
     "cleaning.py",
     "cleaning_lots.py",
     "exploration.py",

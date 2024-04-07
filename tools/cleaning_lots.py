@@ -185,7 +185,7 @@ new_lots["renewal"] = new_lots["renewal"].replace({"N": False, "Y": True})
 
                                                           
 # Exporter data
-new_lots.to_csv("../data/lots_v2.csv", sep = ";", index = None, header=True)
+new_lots.to_csv("../data/Lots.csv", sep = ";", index = None, header=True)
 
 """
 # Les valeurs manquantes sont ensuite remplacées par la médiane de la variable concernée
