@@ -21,7 +21,7 @@ Importation des tables
 """
 agents = pd.read_csv("../data/agents_v2.csv", sep=";")
 agents_with_effectif = pd.read_csv("../data/export_v1.csv", sep=",")
-lots = pd.read_csv("../data/lots_v2.csv", sep=";")
+lots = pd.read_csv("../data/Lots.csv", sep=",")
 lotSuppliers = pd.read_csv("../data/LotSuppliers.csv", sep=",")
 
 print("Nombre de tranche inconnues =", agents_with_effectif["trancheEffectifsEtablissement"].isna().sum() + (agents_with_effectif["trancheEffectifsEtablissement"] == "NN").sum())

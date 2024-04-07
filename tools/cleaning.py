@@ -104,7 +104,7 @@ def clean_contractor_sme():
                 df.at[index, 'lotsNumber'] = 1
             elif re.search('\W', str(row['lotsNumber']).upper()) or re.search('SANS SUITE', str(row['lotsNumber']).strip().upper()) or re.search('', str(row['lotsNumber']).strip().upper()):
                 df.drop(index)
-    df.to_csv("../data/Lots_v3.csv", index=False)
+    df.to_csv("../data/Lots.csv", index=False)
     return df
 
 df_new = clean_contractor_sme()

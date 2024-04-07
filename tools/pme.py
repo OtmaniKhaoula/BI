@@ -67,7 +67,7 @@ Importation des tables
 agents = pd.read_csv("../data/Agents.csv", sep=",")
 criteria = pd.read_csv("../data/Criteria.csv", sep=",")
 lotBuyers = pd.read_csv("../data/LotBuyers.csv", sep=",")
-lots = pd.read_csv("../data/lots_v2.csv", sep=";")
+lots = pd.read_csv("../data/Lots.csv", sep=",")
 lotSuppliers = pd.read_csv("../data/LotSuppliers.csv", sep=",")
 name = pd.read_csv("../data/Names.csv", sep=",")
 
