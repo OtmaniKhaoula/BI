@@ -198,8 +198,9 @@ Supprimer les lignes où une des deux colonnes est égales à NA
 df = lots.dropna(subset=["contractorSme"], axis=0)
 df = df.reset_index(drop=True)
 
-df = df[(df["contractorSme"] == "Y") | (df["contractorSme"] == "N")]
-df['contractorSme'] = df['contractorSme'].replace({'Y': '1', 'N': '0'}).astype(float)
+print("shape de df = ", df.shape)
+#df = df[(df["contractorSme"] == "Y") | (df["contractorSme"] == "N")]
+#df['contractorSme'] = df['contractorSme'].replace({'Y': '1', 'N': '0'}).astype(float)
 
 data_with_cpv = stat_cpv(df, liste)
 
@@ -248,7 +249,7 @@ other_divisions = [all_divisions[i] - sme_divisions[i] for i in range(len(all_di
 pos = np.arange(contractorSme.shape[0])
 width = 0.35
 
-# Création du diagramme en bâtons (bâtons côte à côte)
+# Graphique
 plt.figure(figsize=(24,12))
 plt.bar(pos - width/2, sme_divisions, width, color='lightsteelblue')
 plt.bar(pos + width/2, other_divisions, width, color='IndianRed')

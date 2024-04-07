@@ -16,33 +16,32 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import pearsonr
+from scipy.stats import shapiro
+import seaborn as sns
 
 ###############################################################################
 
 ###############################################################################   
 
-# Importer table avec les lots et le id des buyers et suppliers 
+# Importer la table avec les lots et les ID des acheteurs et fournisseurs
 data = pd.read_csv("../data/data_with_suppliers_buyers.csv", sep=";")
 
-# Nombre de lots par fournisseurs
+# Nombre de lots par fournisseur
 frequence = data["agentId_suppliers"].value_counts()
+frequence_frequence = frequence.value_counts()
 
-"""
-x_pos = np.arange(len(frequence))
+# Créer le tracé
+plt.figure(figsize=(15, 9)) 
+plt.hist(frequence, bins=100)  # Vous pouvez ajuster le nombre de bacs selon vos données
+plt.xlabel('Nombre de contrats', fontsize=14)
+plt.ylabel('Log(Fréquence)', fontsize=14)
+plt.yscale('log')
+plt.savefig('../graphics/suppliers/suppliersId.png')
 
-plt.figure(figsize=(9, 9))
-plt.bar(x_pos, frequence)
-# Étiqueter les barres avec les modalités
-plt.xticks(x_pos, frequence.value_counts, rotation=90, fontsize=8)
-plt.xlabel('Nombre de lots')
-plt.ylabel('Fréquence')
-#plt.ylim(0, max(frequence_valeurs)*1.2)
-plt.show()
-#plt.savefig(f'../graphics/{name}/barplot_{col}.png')
-plt.close()
-"""
+# Shapiro test
+shapiro(frequence)
 
-# Jointure afin de pouvoir analyser le nombre de lots par fournisseurs et le prix des lots 
+# Jointure afin de pouvoir analyser le nombre de lots par fournisseurs 
 frequence = pd.DataFrame(frequence)
 frequence['nb_lots'] = frequence['agentId_suppliers']
 frequence['agentId_suppliers'] = frequence.index
@@ -60,7 +59,7 @@ data_without_na['awardDate'] = pd.to_datetime(data_without_na['awardDate'])
 
 # Supprimer les dates aberrantes
 fin = pd.Timestamp('2023-12-31')
-resultat_filtre = data_without_na[(data_without_na['awardDate'] <= fin)]
+data_without_na = data_without_na[(data_without_na['awardDate'] <= fin)]
 
 data_suppliers = data_without_na.groupby('agentId_suppliers')['awardDate'].apply(list).reset_index()
 
@@ -74,6 +73,10 @@ data_suppliers["durate_days"] = data_suppliers["durate"].dt.days
 # Mettre en avant la durée pendant laquelle les fournisseurs étaient dans le marché public
 data_suppliers["durate_days"].describe()
 
+# test de normalité sur la durée en jours
+shapiro(data_suppliers["durate_days"])
+
+# Graphique de la dsitribution de la durée
 plt.figure(figsize=(15, 9)) 
 plt.hist(data_suppliers["durate_days"], bins = 30, label="histogramme", color="skyblue")
 # Ajouter des lignes verticales pour les statistiques (moyenne, médiane, etc.)
@@ -98,12 +101,17 @@ plt.close()
 # Graphique sur les fréquences d'entrées et de sorties des fournisseurs
 
 # Nombre d'entrées et de sorties pour chaque date
-entrees = data_suppliers['debut'].value_counts().sort_index()
-sorties = data_suppliers['fin'].value_counts().sort_index()
+entrees = data_suppliers['debut'].value_counts()
+sorties = data_suppliers['fin'].value_counts()
+
+entrees_sorted_index = entrees.index.sort_values()
+sorties_sorted_index = sorties.index.sort_values()
+
+# Graphiques
 
 plt.figure(figsize=(10, 6))
-plt.plot(entrees.index, entrees.values, label='Entrées', color='blue')
-plt.plot(sorties.index, sorties.values, label='Sorties', color='red')
+plt.plot(entrees_sorted_index, entrees.loc[entrees_sorted_index], label='Entrées', color='blue')
+plt.plot(sorties_sorted_index, sorties.loc[sorties_sorted_index], label='Sorties', color='red')
 
 plt.xlabel('Date')
 plt.ylabel('Fréquence')
@@ -113,6 +121,13 @@ plt.xticks(rotation=45)  # Pour faire pivoter les étiquettes de l'axe des x
 plt.tight_layout()       # Pour ajuster la disposition du graphique
 plt.savefig('../graphics/suppliers/date_entree_sortie.png')
 plt.close()
+
+# Graphique avec seulement les années
+annee_entree =  data_suppliers['debut'].dt.year.value_counts()
+annee_sortie =  data_suppliers['fin'].dt.year.value_counts()
+
+entrees_sorted_index = annee_entree.index.sort_values()
+sorties_sorted_index = annee_sortie.index.sort_values()
 
 #Lien entre la durée et le nombre de fournisseurs
 data_suppliers = data_suppliers.merge(frequence, on='agentId_suppliers', how='left')
@@ -161,7 +176,8 @@ plt.plot(data_award_price["nb_lots"], data_award_price["mean_awardPrice"], marke
 
 # Ajout de titres et de labels
 plt.xlabel('Nombre de lots')
-plt.ylabel('Prix')
+plt.ylabel('Log(Prix)')
+plt.yscale('log')
 # Affichage du graphique
 plt.savefig('../graphics/suppliers/price_nb_lots.png')
 plt.close()
