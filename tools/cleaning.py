@@ -21,7 +21,7 @@ patterns = {
 bad_words = ['15 (CRITERE', '15) NOTE:']
 def clean_names():
     csv_file = '../data/Agents.csv'
-    df = pd.read_csv(csv_file, index_col=False)
+    df = pd.read_csv(csv_file, index_col=False, sep=",")
     for index, row in df.iterrows():
         row['name'] = row['name'].strip()
         row['name'] = row['name'].replace("CNRS", "CENTRE NATIONAL DE LA RECHERCHE SCIENTIFIQUE")
@@ -46,6 +46,12 @@ def clean_names():
             df = df.drop(index)
     return df
 
+"""
+df = clean_names()
+df.to_csv("../data/Agents_v2.csv", index=False, sep=",")
+print('DONE CLEANING')
+"""
+
 # Get longitude and latitude from address using geopy
 def get_lat_long(address):
     geolocator = Photon(user_agent="geoapiExercises")
@@ -56,8 +62,8 @@ def get_lat_long(address):
         return None, None
 
 def complete_address_info():
-    csv_file = '../data/Agents.csv'
-    df = pd.read_csv(csv_file, index_col=False)
+    csv_file = '../data/Agents_v2.csv'
+    df = pd.read_csv(csv_file, index_col=False, sep=",")
     i = 0
     # Iterate over each row
     for index, row in df.iterrows():
@@ -78,13 +84,15 @@ def complete_address_info():
                         df.at[index, 'longitude'] = long
     print("There was {} addresses with missing long/lat values".format(i))
     # Rewrite the whole table in the same CSV file
-    df.to_csv(csv_file, index=False)
-    return df
+    df.to_csv("../data/Agents_v2.csv", index=False, sep=",")
+    print("nb de valeur manquante après nettoyage de latitude et longitude = ", df.isna().sum())
+
+#complete_address_info()
 
 def clean_contractor_sme():
     bad_lot = [r'\d\W\d', 'UNIQUE', 'SEUL', r'\d(.*)ET(.*)\d', r'\W', r'\d{7,}']
     csv_file = "../data/Lots.csv"
-    df = pd.read_csv(csv_file, index_col=False)
+    df = pd.read_csv(csv_file, index_col=False, sep=",")
     print(df.columns)
     for index, row in df.iterrows():
         if (index%100000==0):
@@ -104,7 +112,7 @@ def clean_contractor_sme():
                 df.at[index, 'lotsNumber'] = 1
             elif re.search('\W', str(row['lotsNumber']).upper()) or re.search('SANS SUITE', str(row['lotsNumber']).strip().upper()) or re.search('', str(row['lotsNumber']).strip().upper()):
                 df.drop(index)
-    df.to_csv("../data/Lots.csv", index=False)
+    df.to_csv("../data/Lots_v2.csv", index=False, sep=",")
     return df
 
-df_new = clean_contractor_sme()
+#clean_contractor_sme()

@@ -19,9 +19,9 @@ plt.style.use('ggplot')
 """
 Importation des tables
 """
-agents = pd.read_csv("../data/agents_v2.csv", sep=";")
-agents_with_effectif = pd.read_csv("../data/export_v1.csv", sep=",")
-lots = pd.read_csv("../data/Lots.csv", sep=",")
+agents = pd.read_csv("../data/Agents_v2.csv", sep=",")
+agents_with_effectif = pd.read_csv("etablissementData.txt", sep=",")
+lots = pd.read_csv("../data/Lots_v2.csv", sep=";")
 lotSuppliers = pd.read_csv("../data/LotSuppliers.csv", sep=",")
 
 print("Nombre de tranche inconnues =", agents_with_effectif["trancheEffectifsEtablissement"].isna().sum() + (agents_with_effectif["trancheEffectifsEtablissement"] == "NN").sum())
@@ -69,6 +69,7 @@ def discretize4(data):
     
     return data
 
+"""
 def discretize2(data):
     
     categories = []
@@ -90,6 +91,7 @@ def discretize2(data):
     data["pme"] = categories
     
     return data
+"""
 
 suppliers = suppliers.replace('NN', np.nan)
 

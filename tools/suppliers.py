@@ -37,6 +37,7 @@ plt.xlabel('Nombre de contrats', fontsize=14)
 plt.ylabel('Log(Fréquence)', fontsize=14)
 plt.yscale('log')
 plt.savefig('../graphics/suppliers/suppliersId.png')
+plt.close()
 
 # Shapiro test
 shapiro(frequence)

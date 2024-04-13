@@ -12,10 +12,10 @@ import numpy as np
 """
 Importation des tables
 """
-agents = pd.read_csv("../data/Agents.csv", sep=",")
+agents = pd.read_csv("../data/Agents_v2.csv", sep=",")
 criteria = pd.read_csv("../data/Criteria.csv", sep=",")
 lotBuyers = pd.read_csv("../data/LotBuyers.csv", sep=",")
-lots = pd.read_csv("../data/Lots.csv", sep=",")
+lots = pd.read_csv("../data/Lots_v2.csv", sep=",")
 lotSuppliers = pd.read_csv("../data/LotSuppliers.csv", sep=",")
 name = pd.read_csv("../data/Names.csv", sep=",")
 
@@ -40,18 +40,12 @@ dataNames = ["lots"]
 for names, data in zip(dataNames, dataList):
     
     if(names == "agents"):      
-        #data['siret'] = data['siret'].fillna(0)
         data['siret'] = data['siret'].astype('object')
-        #data['zipcode'] = data['zipcode'].fillna(0)
         data['zipcode'] = data['zipcode'].astype('object')
      
     elif(names == "lots"):
-        #data['cpv'] = data['cpv'].fillna(0)
         data['cpv'] = data['cpv'].astype('object')
         data['correctionsNb'] = data['correctionsNb'].astype('float64')
-    #print(data.shape)
-    #print(names, " = ", data.dtypes)
-
 
 # Usage de IsolationForest pour détecter les valeurs aberrantes
 def outliers(dataList_float, dataNames, indexs):
@@ -158,7 +152,7 @@ def verify_error(data):
         if(data.loc[i,"contractorSme"]!="Y" and data.loc[i,"contractorSme"]!="N"):
             
             data.loc[i,"contractorSme"] = np.nan
-    
+            
     return data
 
 new_lots = verify_error(new_lots)
@@ -185,7 +179,7 @@ new_lots["renewal"] = new_lots["renewal"].replace({"N": False, "Y": True})
 
                                                           
 # Exporter data
-new_lots.to_csv("../data/Lots.csv", sep = ";", index = None, header=True)
+new_lots.to_csv("../data/Lots_v2.csv", sep = ";", index = None, header=True)
 
 """
 # Les valeurs manquantes sont ensuite remplacées par la médiane de la variable concernée
